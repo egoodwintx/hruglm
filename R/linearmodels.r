@@ -40,6 +40,12 @@ library(broom)
 # Specific Impulse Efficiency  (%)   45-48
 # #### End Dataset Description ####
 
+bonds.dat = read.csv("http://www.stat.tamu.edu/~sheather/book/docs/datasets/bonds.txt", sep='\t')
+p = ggplot(data = bonds.dat, aes(CouponRate, BidPrice)) +
+  geom_point() +
+  ggtitle("BidPrice vs CouponRate")
+p
+
 widthlen = c(4,4,4,4,3,5,4,4,3,5,4,4) # set up fixed width file format
 nasa1.dat = read.fwf("http://www.stat.ufl.edu/~winner/data/nasa1.dat", widthlen,
                      sep="\t", header = FALSE)
