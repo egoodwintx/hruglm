@@ -95,12 +95,29 @@ plot(nasalm_3, which=1:4)
 
 dev.off()
 ## make into ggplot 2 graph
-x <- c(173, 169, 176, 166, 161, 164, 160, 158, 180, 187)
-y <- c(80, 68, 72, 75, 70, 65, 62, 60, 85, 92) # plot scatterplot and the regression line
-mod1 <- lm(y ~ x)
-plot(x, y, xlim=c(min(x)-5, max(x)+5), ylim=c(min(y)-10, max(y)+10))
-abline(mod1, lwd=2)
+simple.df = data.frame(x = c(173, 169, 176, 166, 161, 164, 160, 158, 180, 187),
+                       y = c(80, 68, 72, 75, 70, 65, 62, 60, 85, 92))
+mod1 <- lm(y ~ x, data = simple.df)
 
+p = ggplot(simple.df, aes(x, y))
+p_point = p + geom_point()
+p_point
+
+p_abline = p_point + geom_abline(aes(intercept = mod1$coefficients[1], slope = mod1$coefficients[2]))
+p_abline
+
+p_abline_multi = p_abline +
+  geom_abline(aes(intercept = -112, slope = 1.090), colour = "green") +
+  geom_abline(aes(intercept = -65, slope = 0.82), colour = "red") +
+  geom_abline(aes(intercept = -96, slope = 0.90), colour = "blue") +
+  geom_abline(aes(intercept = -90, slope = 1.05), colour = "orange")
+p_abline_multi
+
+res = residuals(mod1)
+pre = predict(mod1)
+
+p_seg = p_abline  + geom_segment(aes(x = x, y = y, xend = x, yend = pre), colour="red")
+p_seg
 
 # calculate residuals and predicted values
 res <- signif(residuals(mod1), 5)
