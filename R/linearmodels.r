@@ -48,7 +48,9 @@ names(nasa1.dat) = c("nozarea", "propmix",
 summary(nasa1.dat)
 pairs(nasa1.dat) # let's look at a correlation matrix
 corrgram(nasa1.dat)
-
+attach(nasa1.dat)
+hist(nasa1.dat$specimpulse)
+plot(vacimpulse ~ nozarea, propmix)
 
 # p = ggplot(nasa1.dat, aes(x=vacthrusteff, y=specimpulse)) + geom_point()
 # p
