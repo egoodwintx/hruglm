@@ -16,6 +16,10 @@
 
 library(ggplot2)
 library(dplyr)
+library(mboost)
+library(corrgram)
+library(lmtest)
+library(broom)
 
 # #### Dataset Description ####
 # Dataset:  nasa1.dat
@@ -66,4 +70,61 @@ nasalm_3 = lm(data = nasa1.dat,
               vacthrustco ~ nozarea + propmix)
 summary(nasalm_3)
 
+
+nasalm_4 = lm(data = nasa1.dat,
+              specimpulse ~ .)
+summary(nasalm_4)
+
+## diagnostic plots
+plot(resid(nasalm_3))
+par(mfrow=c(2,2))
+plot(nasalm_3, which=1:4)
+
+
+## F-test, assumptions (normality)
 # ordinary least squares vs. generalized linear models
+
+
+dev.off()
+## make into ggplot 2 graph
+x <- c(173, 169, 176, 166, 161, 164, 160, 158, 180, 187)
+y <- c(80, 68, 72, 75, 70, 65, 62, 60, 85, 92) # plot scatterplot and the regression line
+mod1 <- lm(y ~ x)
+plot(x, y, xlim=c(min(x)-5, max(x)+5), ylim=c(min(y)-10, max(y)+10))
+abline(mod1, lwd=2)
+
+
+# calculate residuals and predicted values
+res <- signif(residuals(mod1), 5)
+pre <- predict(mod1) # plot distances between points and the regression line
+segments(x, y, x, pre, col="red")
+
+# add labels (res values) to points
+library(calibrate)
+textxy(x, y, res, cx=0.7)
+
+
+# ## Presentation
+# lm(formula, data, subset, weights, na.action,
+#    method = "qr", model = TRUE, x = FALSE, y = FALSE, qr = TRUE,
+#    singular.ok = TRUE, contrasts = NULL, offset, ...)
+#
+## what is a linear model?
+## when can we use it? quantitative, normal data
+## what is the lm formula and its inputs?
+## what are the downsides to this model? relatively inflexible and simple
+# Given that estimation is undertaken on the basis of a least
+# squares analysis, estimates of the unknown parameters βj are determined by
+# minimising a sum of squares function {\displaystyle S=\sum
+# _{i=1}^{n}\left(Y_{i}-\beta _{0}-\beta _{1}\phi _{1}(X_{i1})-\cdots -\beta
+# _{p}\phi _{p}(X_{ip})\right)^{2}.} S=\sum _{{i=1}}^{n}\left(Y_{i}-\beta
+# _{0}-\beta _{1}\phi _{1}(X_{{i1}})-\cdots -\beta _{p}\phi
+# _{p}(X_{{ip}})\right)^{2}. From this, it can readily be seen that the "linear"
+# aspect of the model means the following: the function to be minimised is a
+# quadratic function of the βj for which minimisation is a relatively simple
+# problem; the derivatives of the function are linear functions of the βj making
+# it easy to find the minimising values; the minimising values βj are linear
+# functions of the observations Yi; the minimising values βj are linear
+# functions of the random errors εi which makes it relatively easy to determine
+# the statistical properties of the estimated values of βj.
+
