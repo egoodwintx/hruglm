@@ -1,25 +1,104 @@
-# Hello, world!
-#
-# This is an example function named 'hello'
-# which prints 'Hello, world!'.
-#
-# You can learn more about package authoring with RStudio at:
-#
-#   http://r-pkgs.had.co.nz/
-#
-# Some useful keyboard shortcuts for package authoring:
-#
-#   Build and Reload Package:  'Ctrl + Shift + B'
-#   Check Package:             'Ctrl + Shift + E'
-#   Test Package:              'Ctrl + Shift + T'
-#
+##
+## [linearmodels.r]
+##
+## author     : Ed Goodwin
+## project    : Linear Regression HRUG Talk
+## createdate : 06.02.2017
+##
+## description:
+##    code to create plots and linear models for HRUG talk
+##
+## version: 0.01
+## changelog:
+##
 
 library(ggplot2)
 library(dplyr)
-library(mboost)
 library(corrgram)
 library(lmtest)
 library(broom)
+
+######### THE SIMPLE DATASET ########
+simple.df = data.frame(x = c(173, 169, 176, 166, 161, 164, 160, 158, 180, 187),
+                       y = c(80, 68, 72, 75, 70, 65, 62, 60, 85, 92))
+
+## create linear regression model
+mod1 <- lm(y ~ x, data = simple.df)
+
+## simple scatter plot of points
+p = ggplot(simple.df, aes(x, y))
+p_point = p + geom_point()
+p_point
+
+## plot line of regression model on scatterplot
+p_abline = p_point + geom_abline(aes(intercept = mod1$coefficients[1], slope = mod1$coefficients[2]))
+p_abline
+
+## plot multiple other lines on scatterplot to illustrate search for regression line
+p_abline_multi = p_abline +
+  geom_abline(aes(intercept = -112, slope = 1.090), colour = "green") +
+  geom_abline(aes(intercept = -65, slope = 0.82), colour = "red") +
+  geom_abline(aes(intercept = -96, slope = 0.90), colour = "blue") +
+  geom_abline(aes(intercept = -90, slope = 1.05), colour = "orange")
+p_abline_multi
+
+## calc residuals and plot error lines on regression plot
+res = residuals(mod1)
+pre = predict(mod1)
+p_seg = p_abline  + geom_segment(aes(x = x, y = y, xend = x, yend = pre), colour="red")
+p_seg
+
+
+## clear the plots
+dev.off()
+
+######### THE BOND DATASET ########
+bonds.dat = read.csv("http://www.stat.tamu.edu/~sheather/book/docs/datasets/bonds.txt", sep='\t')
+p = ggplot(data = bonds.dat, aes(CouponRate, BidPrice)) +
+  geom_point() +
+  ggtitle("BidPrice vs CouponRate")
+p
+
+bondmodel = lm(BidPrice ~ CouponRate, data = bonds.dat)
+
+pbond = p + geom_abline(aes(intercept = bondmodel$coefficients[1],
+                            slope = bondmodel$coefficients[2]),
+                        colour = "green") +
+  ggtitle("BidPrice vs CouponRate\n with Regression Line")
+pbond
+res = residuals(bondcleanmodel)
+pre = predict(bondcleanmodel)
+p_seg = pbond  + geom_segment(aes(x = CouponRate, y = BidPrice, xend = CouponRate, yend = pre), colour="red")
+p_seg
+
+## eliminate three outliers
+bondsclean.dat = bonds.dat[-c(4, 13, 35),]
+bondcleanmodel = lm(BidPrice ~ CouponRate, data = bondsclean.dat)
+p = ggplot(data = bondsclean.dat, aes(CouponRate, BidPrice)) +
+  geom_point() +
+  ggtitle("BidPrice vs CouponRate")
+p
+
+
+pbond = p + geom_abline(aes(intercept = bondcleanmodel$coefficients[1],
+                            slope = bondcleanmodel$coefficients[2]),
+                        colour = "green") +
+  ggtitle(" Vanilla Bond\n BidPrice vs CouponRate\n with Regression Line")
+pbond
+res = residuals(bondcleanmodel)
+pre = predict(bondcleanmodel)
+p_seg = pbond  + geom_segment(aes(x = CouponRate, y = BidPrice, xend = CouponRate, yend = pre), colour="red")
+p_seg
+
+## clear the plots
+dev.off()
+
+## Evaluate models
+# RSS Residual Sum of Squares
+# Null hypothesis
+# Alternative hypothesis
+# RSE Residual Standard Error
+# R2
 
 # #### Dataset Description ####
 # Dataset:  nasa1.dat
@@ -39,13 +118,6 @@ library(broom)
 # Vacuum Specific Impulse    36-40
 # Specific Impulse Efficiency  (%)   45-48
 # #### End Dataset Description ####
-
-bonds.dat = read.csv("http://www.stat.tamu.edu/~sheather/book/docs/datasets/bonds.txt", sep='\t')
-p = ggplot(data = bonds.dat, aes(CouponRate, BidPrice)) +
-  geom_point() +
-  ggtitle("BidPrice vs CouponRate")
-p
-
 widthlen = c(4,4,4,4,3,5,4,4,3,5,4,4) # set up fixed width file format
 nasa1.dat = read.fwf("http://www.stat.ufl.edu/~winner/data/nasa1.dat", widthlen,
                      sep="\t", header = FALSE)
@@ -93,40 +165,8 @@ plot(nasalm_3, which=1:4)
 # ordinary least squares vs. generalized linear models
 
 
-dev.off()
-## make into ggplot 2 graph
-simple.df = data.frame(x = c(173, 169, 176, 166, 161, 164, 160, 158, 180, 187),
-                       y = c(80, 68, 72, 75, 70, 65, 62, 60, 85, 92))
-mod1 <- lm(y ~ x, data = simple.df)
 
-p = ggplot(simple.df, aes(x, y))
-p_point = p + geom_point()
-p_point
 
-p_abline = p_point + geom_abline(aes(intercept = mod1$coefficients[1], slope = mod1$coefficients[2]))
-p_abline
-
-p_abline_multi = p_abline +
-  geom_abline(aes(intercept = -112, slope = 1.090), colour = "green") +
-  geom_abline(aes(intercept = -65, slope = 0.82), colour = "red") +
-  geom_abline(aes(intercept = -96, slope = 0.90), colour = "blue") +
-  geom_abline(aes(intercept = -90, slope = 1.05), colour = "orange")
-p_abline_multi
-
-res = residuals(mod1)
-pre = predict(mod1)
-
-p_seg = p_abline  + geom_segment(aes(x = x, y = y, xend = x, yend = pre), colour="red")
-p_seg
-
-# calculate residuals and predicted values
-res <- signif(residuals(mod1), 5)
-pre <- predict(mod1) # plot distances between points and the regression line
-segments(x, y, x, pre, col="red")
-
-# add labels (res values) to points
-library(calibrate)
-textxy(x, y, res, cx=0.7)
 
 
 # ## Presentation
