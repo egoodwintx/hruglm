@@ -83,7 +83,7 @@ p
 pbond = p + geom_abline(aes(intercept = bondcleanmodel$coefficients[1],
                             slope = bondcleanmodel$coefficients[2]),
                         colour = "green") +
-  ggtitle(" Vanilla Bond\n BidPrice vs CouponRate\n with Regression Line")
+  ggtitle(" Vanilla Bond")
 pbond
 res = residuals(bondcleanmodel)
 pre = predict(bondcleanmodel)
