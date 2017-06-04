@@ -17,6 +17,7 @@ library(dplyr)
 library(corrgram)
 library(lmtest)
 library(broom)
+library(ISLR)
 
 ######### THE SIMPLE DATASET ########
 simple.df = data.frame(x = c(173, 169, 176, 166, 161, 164, 160, 158, 180, 187),
@@ -66,8 +67,8 @@ pbond = p + geom_abline(aes(intercept = bondmodel$coefficients[1],
                         colour = "green") +
   ggtitle("BidPrice vs CouponRate\n with Regression Line")
 pbond
-res = residuals(bondcleanmodel)
-pre = predict(bondcleanmodel)
+res = residuals(bondmodel)
+pre = predict(bondmodel)
 p_seg = pbond  + geom_segment(aes(x = CouponRate, y = BidPrice, xend = CouponRate, yend = pre), colour="red")
 p_seg
 
@@ -87,82 +88,28 @@ pbond = p + geom_abline(aes(intercept = bondcleanmodel$coefficients[1],
 pbond
 res = residuals(bondcleanmodel)
 pre = predict(bondcleanmodel)
-p_seg = pbond  + geom_segment(aes(x = CouponRate, y = BidPrice, xend = CouponRate, yend = pre), colour="red")
+p_seg = pbond  + geom_segment(aes(x = CouponRate, y = BidPrice,
+                                  xend = CouponRate, yend = pre),
+                              colour="red")
 p_seg
 
 ## clear the plots
 dev.off()
 
-## Evaluate models
-# RSS Residual Sum of Squares
-# Null hypothesis
-# Alternative hypothesis
-# RSE Residual Standard Error
-# R2
+## Advertising data set from ISLR
+ad.dat = read.csv("http://www-bcf.usc.edu/~gareth/ISL/Advertising.csv")
 
-# #### Dataset Description ####
-# Dataset:  nasa1.dat
-#
-# Source: R.S. Jankovsky, T.D. Smith, A.J. Pavli (1999). "High-Area-Ratio Rocket
-# Nozzle at High Combustion Chamber Pressure-Experimental and Analytical
-# Validation", NASA/TP-1999-208522
-#
-# Description: Experiments with nozzle experiment area ratio and propellant
-# mixture ratios in rockets
-#
-# Variables/Columns
-# Nozzle Area Ratio  5-8
-# Propellant Mixture Ratio  (O/F)  13-16  /* Oxidizer flow / fuel flow  */
-#   Vacuum Thrust Coefficient  20-24
-# Vacuum Thrust Efficiency (%)  29-32
-# Vacuum Specific Impulse    36-40
-# Specific Impulse Efficiency  (%)   45-48
-# #### End Dataset Description ####
-widthlen = c(4,4,4,4,3,5,4,4,3,5,4,4) # set up fixed width file format
-nasa1.dat = read.fwf("http://www.stat.ufl.edu/~winner/data/nasa1.dat", widthlen,
-                     sep="\t", header = FALSE)
-nasa1.dat = nasa1.dat[,c(2,4,6,8,10,12)] # pull out columns with data
-names(nasa1.dat) = c("nozarea", "propmix",
-                     "vacthrustco", "vacthrusteff",
-                     "vacimpulse", "specimpulse")
+## Let's look at the ad data
+summary(ad.dat)
+pairs(ad.dat)
+corrgram(ad.dat)
 
-## Let's explore the data...summary stats, correlation matrix, etc.
-summary(nasa1.dat)
-pairs(nasa1.dat) # let's look at a correlation matrix
-corrgram(nasa1.dat)
-attach(nasa1.dat)
-hist(nasa1.dat$specimpulse)
-plot(vacimpulse ~ nozarea, propmix)
-
-# p = ggplot(nasa1.dat, aes(x=vacthrusteff, y=specimpulse)) + geom_point()
-# p
-
-# linear models
-nasalm_1 = lm(data = nasa1.dat,
-              specimpulse ~ nozarea + propmix + vacthrustco)
-
-nasalm_2 = lm(data = nasa1.dat,
-              specimpulse ~ nozarea + propmix)
-summary(nasalm_1)
-summary(nasalm_2)
-
-nasalm_3 = lm(data = nasa1.dat,
-              vacthrustco ~ nozarea + propmix)
-summary(nasalm_3)
-
-
-nasalm_4 = lm(data = nasa1.dat,
-              specimpulse ~ .)
-summary(nasalm_4)
-
-## diagnostic plots
-plot(resid(nasalm_3))
-par(mfrow=c(2,2))
-plot(nasalm_3, which=1:4)
-
+sales.mod = lm(data = ad.dat, Sales ~ TV + Newspaper + Radio)
+tidy(sales.mod)
+pairs(ad.dat)
+corrgram(ad.dat)
 
 ## F-test, assumptions (normality)
-# ordinary least squares vs. generalized linear models
 
 
 
