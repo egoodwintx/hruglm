@@ -38,13 +38,6 @@ p_Newspaper = ggplot(data=ad.dat, aes(x=Newspaper, y=Sales)) + geom_point()
 p_Radio = ggplot(data=ad.dat, aes(x=Radio, y=Sales)) + geom_point()
 grid.arrange(p_TV, p_Newspaper, p_Radio, ncol=2)
 
-p_TV = ggplot(data=ad.dat, aes(x=TV, y=boxCoxVariable(Sales))) + geom_point()
-p_TV
-
-par(mfrow = c(1,1))
-grid.arrange(ncol=1)
-bc = boxcox(data = ad.dat, Sales ~ TV)
-
 sales.mod2 = lm(data = ad.dat, Sales ~ TV + Radio)
 summary(sales.mod2)
 

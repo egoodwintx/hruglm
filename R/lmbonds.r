@@ -46,4 +46,4 @@ p_seg = pbond  + geom_segment(aes(x = CouponRate, y = BidPrice,
 p_seg
 
 ## clear the plots
-dev.off()
+## dev.off()
